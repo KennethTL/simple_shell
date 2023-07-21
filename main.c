@@ -14,14 +14,24 @@ int main(int ac, char **argv)
     /* below, this stores whatever is being typed in the shell */
     char *lineptr;
     size_t i = 0;
+    ssize_t nchars; /* This variables simply stores the number of characters in a line*/
     /* declaring void variables */
     (void)ac;
     (void)argv;
-    /*printing the prompt*/
-    printf("%s", prompt);
-    /* the getline built-in function grabs whatever is being typed */
-    getline(&lineptr, &i, stdin);
-    printf("%s\n", lineptr);
+    /* adding a loop*/
+    while (1)
+    {
+        /*printing the prompt*/
+        printf("%s", prompt);
+        nchars = getline(&lineptr, &i, stdin);
+        /* checks if the getline() fails or reach EOF,  the getline built-in function grabs whatever is being typed */
+        if (nchars == -1)
+        {
+            printf("Exiting Shell...");
+            return (-1);
+        }
+        printf("%s\n", lineptr);
+    }
     /* frees the allocated memory */
     free(lineptr);
     return (0);

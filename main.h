@@ -11,6 +11,6 @@
 #define PROMPT "#cisfun$ "
 #define BUF_SIZE 1024
 
-void shell_interactive(void);
+void exec(char **argv);
 
 #endif /* SHELL_H */

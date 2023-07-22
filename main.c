@@ -12,9 +12,13 @@ int main(int ac, char **argv)
 {
     char *prompt = "shell $ ";
     /* below, this stores whatever is being typed in the shell */
-    char *lineptr;
+    char *lineptr = NULL; /* *lineptr_copy = NULL; */
     size_t i = 0;
     ssize_t nchars; /* This variables simply stores the number of characters in a line*/
+    // const char *delim = " \n";
+    // int num_tokens = 0;
+    // char *token;
+    // int i;
     /* declaring void variables */
     (void)ac;
     (void)argv;
@@ -30,6 +34,8 @@ int main(int ac, char **argv)
             printf("Exiting Shell...");
             return (-1);
         }
+        /* we are trying to allocate space for the copy of whatver gets to be added in the lineptr */
+        // lineptr_copy = malloc(sizeof(char) * nchars);
         printf("%s\n", lineptr);
     }
     /* frees the allocated memory */

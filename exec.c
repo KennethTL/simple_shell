@@ -7,13 +7,15 @@
 
 void exec(char **argv)
 {
-    char *cmd = NULL;
+    char *cmd = NULL, *actual_cmd = NULL;
     if (argv)
     {
         /* grab the command */
         cmd = argv[0];
+        /* generate the path to the command before running into execve */
+        actual_cmd = get_env(cmd);
         /* execute the command with the execve()*/
-        if (execve(cmd, argv, NULL) == -1)
+        if (execve(actual_cmd, argv, NULL) == -1)
         {
             perror("Error: ");
         };

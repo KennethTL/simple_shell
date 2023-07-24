@@ -19,11 +19,13 @@ int main(int ac, char **argv)
     int num_tokens = 0;
     char *token;
     int i;
+    int running = 1;
     /* declaring void variables */
     (void)ac;
-    /* adding a loop*/
-    while (1)
+    /* running the loop*/
+    while (running)
     {
+        int pid;
         /*printing the prompt*/
         printf("%s", prompt);
         n_chars = getline(&line, &p, stdin);
@@ -61,7 +63,22 @@ int main(int ac, char **argv)
             token = strtok(NULL, delim);
         }
         argv[i] = NULL;
-        exec(argv);
+        /* need to create another process in order for the shell not to break*/
+        pid = fork();
+        if (pid == -1)
+        {
+            perror("fork failed");
+            return -1;
+        }
+        else if (pid == 0)
+        {
+            exec(argv);
+            return 0;
+        }
+        else
+        {
+            wait(NULL);
+        }
         printf("%s\n", line);
     }
     /* frees the allocated memory */

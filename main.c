@@ -10,7 +10,7 @@
 
 int main(int ac, char **argv)
 {
-	char *prompt = "shell $ ";
+  char *prompt = "shell $ ";
 	/* below, this stores whatever is being typed in the shell */
 	char *line = NULL, *line_copy = NULL;
 	size_t p = 0;

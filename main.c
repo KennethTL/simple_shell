@@ -12,20 +12,22 @@ int main(void)
     /* below, this stores whatever is being typed in the shell */
     char *line = NULL, *line_copy = NULL;
     size_t p = 0;
-    ssize_t n_chars;     /* Stores the number of characters in a line*/
+    ssize_t n_chars;     /* Stores the number of characters in a line */
     int max_tokens = 64; // Adjust this to your desired maximum number of tokens
     char **tokens;
     int num_tokens;
     char *token;
     int i, j;
-    /* adding a loop*/
+    /* adding a loop */
     while (1)
     {
         int pid;
         char **argv;
         char *cmd;
         char *actual_cmd;
-        /*printing the prompt*/
+        /* Working with exits */
+        /* int exit_status = 0; */
+        /* printing the prompt */
         printf("%s", prompt);
         n_chars = _getline(&line, &p); // Use _getline() instead of getline()
         /* checks if the _getline() fails or reach EOF */
@@ -35,6 +37,12 @@ int main(void)
             return (-1);
         }
         tokens = malloc(sizeof(char *) * max_tokens);
+        if (tokens == NULL)
+        {
+            perror("sh: memory allocation error");
+            free(line);
+            return (-1);
+        }
         num_tokens = get_tokens(line, tokens, max_tokens);
         /* we are trying to allocate space for the copy of whatever gets to be added in the line */
         line_copy = malloc(sizeof(char) * n_chars);
@@ -42,48 +50,66 @@ int main(void)
         {
             perror("sh: memory allocation error");
             free(line); // Free line before exiting
+            free(tokens);
             return (-1);
         }
         /* copy the line into the line variable */
         strcpy(line_copy, line);
         /* Splitting the string into an array of tokens */
-        token = strtok(line, " \n");
-        while (token != NULL)
+        num_tokens = 0;
+        token = line_copy;
+        while (*token != '\0' && *token != '\n')
         {
-            num_tokens++;
-            token = strtok(NULL, " \n");
-        }
-        num_tokens++;
-        /* Allocating space for the array*/
-        argv = malloc(sizeof(char *) * num_tokens);
-        /* store each token in the array */
-        token = strtok(line_copy, " \n");
-        for (i = 0; token != NULL; i++)
-        {
-            argv[i] = malloc(sizeof(char) * strlen(token) + 1); // Add +1 for the null terminator
-            if (argv[i] == NULL)
+            /* Skip leading spaces */
+            while (*token == ' ')
+                token++;
+            if (*token == '\0' || *token == '\n')
+                break;
+            char *end_of_token = token;
+            /* Find the end of the token */
+            while (*end_of_token != ' ' && *end_of_token != '\0' && *end_of_token != '\n')
+                end_of_token++;
+            /* Allocate space for the token and copy it */
+            size_t token_length = end_of_token - token;
+            tokens[num_tokens] = malloc(token_length + 1); // Add +1 for the null terminator
+            if (tokens[num_tokens] == NULL)
             {
                 perror("sh: memory allocation error");
-                free(line_copy); // Free line_copy and argv[i] before exiting
-                for (j = 0; j < i; j++)
+                free(line_copy); // Free line_copy and tokens before exiting
+                for (i = 0; i < num_tokens; i++)
                 {
-                    free(argv[j]);
+                    free(tokens[i]);
                 }
-                free(argv);
+                free(tokens);
                 free(line);
                 return (-1);
             }
-            strcpy(argv[i], token);
-            token = strtok(NULL, " \n");
+            strncpy(tokens[num_tokens], token, token_length);
+            tokens[num_tokens][token_length] = '\0';
+            num_tokens++;
+            token = end_of_token;
         }
-        argv[i] = NULL;
+        tokens[num_tokens] = NULL;
         /* making sure fork isn't called if the cmd doesn't exist */
-        cmd = argv[0];
+        cmd = tokens[0];
         // Check if the user entered 'exit'
-        if (strcmp(cmd, "exit") == 0)
+        if (strcmp(tokens[0], "exit") == 0)
         {
-            printf("Exiting Shell...\n");
-            break; // Exit the loop and terminate the shell
+            if (num_tokens > 1) /* Check if there is an argument for the 'exit' command */
+            {
+                int exit_status = atoi(tokens[1]); /* Convert the argument to an integer */
+                printf("Exiting Shell with status %d...\n", exit_status);
+                free_tokens(tokens);
+                free(line);
+                return exit_status; /* Return the exit status to main and terminate the shell */
+            }
+            else
+            {
+                printf("Exiting Shell...\n");
+                free_tokens(tokens);
+                free(line);
+                return 0; /* Return 0 to main and terminate the shell */
+            }
         }
         else if (strcmp(cmd, "env") == 0)
         {
@@ -93,17 +119,12 @@ int main(void)
         {
             ls_builtin();
         }
-        // Skip execution if the command is the shell program itself
-        else if (strcmp(cmd, "./shell_0.3") == 0)
+        /* Skip execution if the command is the shell program itself */
+        else if (strcmp(cmd, "./shell_0.3") == 0 || strcmp(cmd, "./shell_0.4.1") == 0)
         {
             printf("command not found: %s\n", cmd);
-            free(line_copy);
-            for (i = 0; i < num_tokens; i++)
-            {
-                free(argv[i]);
-            }
-            free(argv);
-            continue; // Go to the next iteration of the loop
+            free_tokens(tokens);
+            continue; /* Go to the next iteration of the loop */
         }
         else
         {
@@ -119,10 +140,12 @@ int main(void)
                 }
                 else if (pid == 0)
                 {
-                    execute_command(actual_cmd, argv);
+                    execute_command(actual_cmd, tokens);
                     perror("execve failed");
                     free(actual_cmd);
-                    exit(EXIT_FAILURE);
+                    free_tokens(tokens);
+                    free(line_copy);
+                    free(line);
                     return 1;
                 }
                 else
@@ -136,15 +159,22 @@ int main(void)
                 printf("command not found: %s \n", cmd);
             }
         }
+        free_tokens(tokens);
         free(line_copy);
-        for (i = 0; i < num_tokens; i++)
-        {
-            free(argv[i]);
-        }
-        free(argv);
     }
     free(tokens);
     /* frees the allocated memory */
     free(line);
     return (0);
+}
+
+/* Function to free the tokens */
+void free_tokens(char **tokens)
+{
+    int i;
+    for (i = 0; tokens[i] != NULL; i++)
+    {
+        free(tokens[i]);
+    }
+    free(tokens);
 }

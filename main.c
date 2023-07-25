@@ -12,9 +12,10 @@ int main(void)
     /* below, this stores whatever is being typed in the shell */
     char *line = NULL, *line_copy = NULL;
     size_t p = 0;
-    ssize_t n_chars; /* Stores the number of characters in a line*/
-    const char *delim = " \n";
-    int num_tokens = 0;
+    ssize_t n_chars;     /* Stores the number of characters in a line*/
+    int max_tokens = 64; // Adjust this to your desired maximum number of tokens
+    char **tokens;
+    int num_tokens;
     char *token;
     int i, j;
     /* adding a loop*/
@@ -26,14 +27,16 @@ int main(void)
         char *actual_cmd;
         /*printing the prompt*/
         printf("%s", prompt);
-        n_chars = getline(&line, &p, stdin);
-        /* checks if the getline() fails or reach EOF, the getline built-in function grabs whatever is being typed */
+        n_chars = _getline(&line, &p); // Use _getline() instead of getline()
+        /* checks if the _getline() fails or reach EOF */
         if (n_chars == -1)
         {
             printf("Exiting Shell...");
             return (-1);
         }
-        /* we are trying to allocate space for the copy of whatver gets to be added in the line */
+        tokens = malloc(sizeof(char *) * max_tokens);
+        num_tokens = get_tokens(line, tokens, max_tokens);
+        /* we are trying to allocate space for the copy of whatever gets to be added in the line */
         line_copy = malloc(sizeof(char) * n_chars);
         if (line_copy == NULL)
         {
@@ -43,18 +46,18 @@ int main(void)
         }
         /* copy the line into the line variable */
         strcpy(line_copy, line);
-        /* Splitting the string into array of tokens */
-        token = strtok(line, delim);
+        /* Splitting the string into an array of tokens */
+        token = strtok(line, " \n");
         while (token != NULL)
         {
             num_tokens++;
-            token = strtok(NULL, delim);
+            token = strtok(NULL, " \n");
         }
         num_tokens++;
         /* Allocating space for the array*/
         argv = malloc(sizeof(char *) * num_tokens);
         /* store each token in the array */
-        token = strtok(line_copy, delim);
+        token = strtok(line_copy, " \n");
         for (i = 0; token != NULL; i++)
         {
             argv[i] = malloc(sizeof(char) * strlen(token) + 1); // Add +1 for the null terminator
@@ -71,7 +74,7 @@ int main(void)
                 return (-1);
             }
             strcpy(argv[i], token);
-            token = strtok(NULL, delim);
+            token = strtok(NULL, " \n");
         }
         argv[i] = NULL;
         /* making sure fork isn't called if the cmd doesn't exist */
@@ -140,6 +143,7 @@ int main(void)
         }
         free(argv);
     }
+    free(tokens);
     /* frees the allocated memory */
     free(line);
     return (0);

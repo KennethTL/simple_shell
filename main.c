@@ -2,13 +2,11 @@
 
 /**
  * main - Building a Shell that's interactive
- * @ac: arguments count
- * @argv: arguments
  *
  * Return: 0 on success, 1 on error
  */
 
-int main(int ac, char **argv)
+int main(void)
 {
     char *prompt = "shell $ ";
     /* below, this stores whatever is being typed in the shell */
@@ -18,13 +16,14 @@ int main(int ac, char **argv)
     const char *delim = " \n";
     int num_tokens = 0;
     char *token;
-    int i;
-    /* declaring void variables */
-    (void)ac;
+    int i, j;
     /* adding a loop*/
     while (1)
     {
         int pid;
+        char **argv;
+        char *cmd;
+        char *actual_cmd;
         /*printing the prompt*/
         printf("%s", prompt);
         n_chars = getline(&line, &p, stdin);
@@ -39,6 +38,7 @@ int main(int ac, char **argv)
         if (line_copy == NULL)
         {
             perror("sh: memory allocation error");
+            free(line); // Free line before exiting
             return (-1);
         }
         /* copy the line into the line variable */
@@ -57,32 +57,90 @@ int main(int ac, char **argv)
         token = strtok(line_copy, delim);
         for (i = 0; token != NULL; i++)
         {
-            argv[i] = malloc(sizeof(char) * strlen(token));
+            argv[i] = malloc(sizeof(char) * strlen(token) + 1); // Add +1 for the null terminator
+            if (argv[i] == NULL)
+            {
+                perror("sh: memory allocation error");
+                free(line_copy); // Free line_copy and argv[i] before exiting
+                for (j = 0; j < i; j++)
+                {
+                    free(argv[j]);
+                }
+                free(argv);
+                free(line);
+                return (-1);
+            }
             strcpy(argv[i], token);
             token = strtok(NULL, delim);
         }
         argv[i] = NULL;
-
-        /* need to create another process in order for the shell not to break*/
-        pid = fork();
-        if (pid == -1)
+        /* making sure fork isn't called if the cmd doesn't exist */
+        cmd = argv[0];
+        // Check if the user entered 'exit'
+        if (strcmp(cmd, "exit") == 0)
         {
-            perror("fork failed");
-            return -1;
+            printf("Exiting Shell...\n");
+            break; // Exit the loop and terminate the shell
         }
-        else if (pid == 0)
+        else if (strcmp(cmd, "env") == 0)
         {
-            exec(argv);
-            return 0;
+            print_env();
+        }
+        else if (strcmp(cmd, "ls") == 0)
+        {
+            ls_builtin();
+        }
+        // Skip execution if the command is the shell program itself
+        else if (strcmp(cmd, "./shell_0.3") == 0)
+        {
+            printf("command not found: %s\n", cmd);
+            free(line_copy);
+            for (i = 0; i < num_tokens; i++)
+            {
+                free(argv[i]);
+            }
+            free(argv);
+            continue; // Go to the next iteration of the loop
         }
         else
         {
-            wait(NULL);
+            actual_cmd = get_env(cmd);
+            if (actual_cmd != NULL)
+            {
+                /* need to create another process in order for the shell not to break*/
+                pid = fork();
+                if (pid == -1)
+                {
+                    perror("fork failed");
+                    return -1;
+                }
+                else if (pid == 0)
+                {
+                    execute_command(actual_cmd, argv);
+                    perror("execve failed");
+                    free(actual_cmd);
+                    exit(EXIT_FAILURE);
+                    return 1;
+                }
+                else
+                {
+                    wait(NULL);
+                }
+                free(actual_cmd);
+            }
+            else
+            {
+                printf("command not found: %s \n", cmd);
+            }
         }
-        printf("%s\n", line);
+        free(line_copy);
+        for (i = 0; i < num_tokens; i++)
+        {
+            free(argv[i]);
+        }
+        free(argv);
     }
     /* frees the allocated memory */
     free(line);
-    free(line_copy);
     return (0);
 }

@@ -1,5 +1,5 @@
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,10 +9,11 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
-#define PROMPT "#shell$ "
-#define BUF_SIZE 1024
-
-void exec(char **argv);
+// Function declarations
 char *get_env(char *cmd);
+void execute_command(char *cmd, char **argv);
+void print_env(void);
+void ls_builtin(void);
+char *_getline(void);
 
-#endif /* SHELL_H */
+#endif /* MAIN_H */

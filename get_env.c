@@ -11,11 +11,10 @@ char *get_env(char *cmd)
 	char *location, *location_copy, *location_token, *file_path;
 	int length_cmd, length_dir;
 	struct stat buffer;
-	/* we grab the path here using the getenv() */
-	location = getenv("PATH");
+
+	location = getenv("PATH"); /* we grab the path here using the getenv() */
 	if (location)
-	{
-		/* remember "strdup" is used here to copy the new location path*/
+	{/* remember "strdup" is used here to copy the new location path*/
 		location_copy = strdup(location);
 		/* getting the length of user cmd that was passed */
 		length_cmd = strlen(cmd);
@@ -30,9 +29,8 @@ char *get_env(char *cmd)
 			strcat(file_path, "/");
 			strcat(file_path, cmd);
 			strcat(file_path, "\0");
-			/* testing to know if the file path exists */
 			if (stat(file_path, &buffer) == 0)
-			{
+			{/*testing to know if the file path exists*/
 				free(location_copy);
 				return (file_path);
 			}

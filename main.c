@@ -100,14 +100,14 @@ int main(void)
 				printf("Exiting Shell with status %d...\n", exit_status);
 				free_tokens(tokens);
 				free(line);
-				return exit_status; /* Return the exit status to main and terminate the shell */
+				return (exit_status); /* Return the exit status to main and terminate the shell */
 			}
 			else
 			{
 				printf("Exiting Shell...\n");
 				free_tokens(tokens);
 				free(line);
-				return 0; /* Return 0 to main and terminate the shell */
+				return (0); /* Return 0 to main and terminate the shell */
 			}
 		}
 		else if (strcmp(cmd, "env") == 0)
@@ -135,7 +135,7 @@ int main(void)
 				if (pid == -1)
 				{
 					perror("fork failed");
-					return -1;
+					return (-1);
 				}
 				else if (pid == 0)
 				{
@@ -145,7 +145,7 @@ int main(void)
 					free_tokens(tokens);
 					free(line_copy);
 					free(line);
-					return 1;
+					return (1);
 				}
 				else
 				{
@@ -172,25 +172,26 @@ void free_tokens(char **tokens)
 {
 	int i;
 	for (i = 0; tokens[i] != NULL; i++)
+
 	{
 		free(tokens[i]);
 	}
 	free(tokens);
 }
-
 /* This is for the setenv & unsetenv functions */
 int set_env(const char *name, const char *value, int overwrite)
 {
 	size_t len_name, len_value, len_env;
 	char *env_variable;
+
 	if (name == NULL || value == NULL)
 	{
 		fprintf(stderr, "setenv: invalid arguments\n");
-		return -1;
+		return (-1);
 	}
 	if (overwrite == 0 && getenv(name) != NULL)
 	{
-		return 0; // Return without setting if overwrite is 0 and the variable already exists
+		return (0); // Return without setting if overwrite is 0 and the variable already exists
 	}
 	// Concatenate name, '=', and value to create the new environment variable
 	len_name = strlen(name);
@@ -200,7 +201,7 @@ int set_env(const char *name, const char *value, int overwrite)
 	if (env_variable == NULL)
 	{
 		perror("setenv");
-		return -1;
+		return (-1);
 	}
 	snprintf(env_variable, len_env, "%s=%s", name, value);
 	// Use putenv to set the environment variable
@@ -208,9 +209,9 @@ int set_env(const char *name, const char *value, int overwrite)
 	{
 		perror("setenv");
 		free(env_variable);
-		return -1;
+		return (-1);
 	}
-	return 0;
+	return (0);
 }
 
 int unset_env(const char *name)
@@ -220,13 +221,13 @@ int unset_env(const char *name)
 	if (name == NULL)
 	{
 		fprintf(stderr, "unsetenv: invalid argument\n");
-		return -1;
+		return (-1);
 	}
 
 	if (getenv(name) == NULL)
 	{
 		fprintf(stderr, "unsetenv: variable '%s' not found\n", name);
-		return -1;
+		return (-1);
 	}
 	// Use putenv to remove the environment variable
 	len_name = strlen(name);
@@ -235,14 +236,14 @@ int unset_env(const char *name)
 	if (env_variable == NULL)
 	{
 		perror("unsetenv");
-		return -1;
+		return (-1);
 	}
 	snprintf(env_variable, len_env, "%s=", name);
 	if (putenv(env_variable) != 0)
 	{
 		perror("unsetenv");
 		free(env_variable);
-		return -1;
+		return (-1);
 	}
-	return 0;
+	return (0);
 }

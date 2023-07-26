@@ -227,9 +227,9 @@ int set_env(const char *name, const char *value, int overwrite)
 }
 
 /**
- * main - Building a Shell that's interactive
- *
- * Return: 0 on success, 1 on error
+ * unset_env - removes an env variable from the env of the calling process
+ *@name: name of the env variable
+ * Return: 0 on success, -1 on error
  */
 int unset_env(const char *name)
 {

@@ -2,13 +2,11 @@
 
 /**
  * main - Building a Shell that's interactive
- * @ac: arguments count
- * @argv: arguments
  *
  * Return: 0 on success, 1 on error
  */
 
-int main(int ac, char **argv)
+int main(void)
 {
     char *prompt = "shell $ ";
     /* below, this stores whatever is being typed in the shell */

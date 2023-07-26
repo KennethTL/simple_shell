@@ -1,7 +1,7 @@
 #include "main.h"
 
 /**
- * get_tokens - Tokenizes the input line using spaces and newline as delimiters.
+ * get_tokens - Tokenizes the input line using spaces & newline as delimiters.
  * @line: The input line to be tokenized.
  * @tokens: Pointer to the array that will store the tokens.
  * @max_tokens: Maximum number of tokens that can be stored in the array.
@@ -13,6 +13,7 @@ int get_tokens(char *line, char *tokens[], int max_tokens)
 	int num_tokens = 0;
 	char *token_start = line;
 	char *current = line;
+
 	while (*current != '\0')
 	{
 		if (*current == ' ' || *current == '\n')

@@ -14,5 +14,13 @@
 
 void exec(char **argv);
 char *get_env(char *cmd);
+void execute_command(char *cmd, char **argv);
+void print_env(void);
+void ls_builtin(void);
+ssize_t _getline(char **lineptr, size_t *n);
+int get_tokens(char *line, char *tokens[], int max_tokens);
+void free_tokens(char **tokens);
+int set_env(const char *name, const char *value, int overwrite);
+int unset_env(const char *name);
 
 #endif /* SHELL_H */

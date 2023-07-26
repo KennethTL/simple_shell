@@ -168,6 +168,11 @@ int main(void)
 }
 
 /* Function to free the tokens */
+/**
+ * free_tokens - frees the tokens
+ * @tokens: tokens to be evaluated
+ * Return: void
+ */
 void free_tokens(char **tokens)
 {
 	int i;
@@ -179,6 +184,11 @@ void free_tokens(char **tokens)
 	free(tokens);
 }
 /* This is for the setenv & unsetenv functions */
+/**
+ * main - Building a Shell that's interactive
+ *
+ * Return: 0 on success, 1 on error
+ */
 int set_env(const char *name, const char *value, int overwrite)
 {
 	size_t len_name, len_value, len_env;
@@ -214,10 +224,16 @@ int set_env(const char *name, const char *value, int overwrite)
 	return (0);
 }
 
+/**
+ * main - Building a Shell that's interactive
+ *
+ * Return: 0 on success, 1 on error
+ */
 int unset_env(const char *name)
 {
 	size_t len_name, len_env;
 	char *env_variable;
+
 	if (name == NULL)
 	{
 		fprintf(stderr, "unsetenv: invalid argument\n");

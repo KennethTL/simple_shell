@@ -39,5 +39,5 @@ int get_tokens(char *line, char *tokens[], int max_tokens)
 		tokens[num_tokens] = token_start;
 		num_tokens++;
 	}
-	return num_tokens;
+	return (num_tokens);
 }

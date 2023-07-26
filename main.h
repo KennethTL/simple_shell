@@ -20,4 +20,7 @@ void free_tokens(char **tokens);
 int set_env(const char *name, const char *value, int overwrite);
 int unset_env(const char *name);
 
+/* Extern declaration */
+extern char **environ;
+
 #endif /* MAIN_H */

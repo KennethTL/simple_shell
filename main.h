@@ -9,7 +9,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
-// Function declarations
+/* Function declarations */
 char *get_env(char *cmd);
 void execute_command(char *cmd, char **argv);
 void print_env(void);

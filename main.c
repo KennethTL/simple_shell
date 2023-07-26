@@ -14,7 +14,7 @@ int main(void)
 	size_t p = 0;
 	size_t token_length;
 	ssize_t n_chars;     /* Stores the number of characters in a line */
-	int max_tokens = 64; // Adjust this to your desired maximum number of tokens
+	int max_tokens = 64; /* Adjust this to your desired maximum number of tokens */
 	char **tokens;
 	int num_tokens;
 	char *token;
@@ -28,7 +28,7 @@ int main(void)
 		char *actual_cmd;
 		/* printing the prompt */
 		printf("%s", prompt);
-		n_chars = _getline(&line, &p); // Use _getline() instead of getline()
+		n_chars = _getline(&line, &p); /* Use _getline() instead of getline() */
 		/* checks if the _getline() fails or reach EOF */
 		if (n_chars == -1)
 		{
@@ -48,7 +48,7 @@ int main(void)
 		if (line_copy == NULL)
 		{
 			perror("sh: memory allocation error");
-			free(line); // Free line before exiting
+			free(line); /* Free line before exiting */
 			free(tokens);
 			return (-1);
 		}
@@ -70,11 +70,11 @@ int main(void)
 				end_of_token++;
 			/* Allocate space for the token and copy it */
 			token_length = end_of_token - token;
-			tokens[num_tokens] = malloc(token_length + 1); // Add +1 for the null terminator
+			tokens[num_tokens] = malloc(token_length + 1); /* Add +1 for the null terminator */
 			if (tokens[num_tokens] == NULL)
 			{
 				perror("sh: memory allocation error");
-				free(line_copy); // Free line_copy and tokens before exiting
+				free(line_copy); /* Free line_copy and tokens before exiting */
 				for (i = 0; i < num_tokens; i++)
 				{
 					free(tokens[i]);
@@ -91,7 +91,7 @@ int main(void)
 		tokens[num_tokens] = NULL;
 		/* making sure fork isn't called if the cmd doesn't exist */
 		cmd = tokens[0];
-		// Check if the user entered 'exit'
+		/* Check if the user entered 'exit' */
 		if (strcmp(tokens[0], "exit") == 0)
 		{
 			if (num_tokens > 1) /* Check if there is an argument for the 'exit' command */
@@ -203,12 +203,12 @@ int set_env(const char *name, const char *value, int overwrite)
 	}
 	if (overwrite == 0 && getenv(name) != NULL)
 	{
-		return (0); // Return without setting if overwrite is 0 and the variable already exists
+		return (0); /* Return without setting if overwrite is 0 and the variable already exists */
 	}
-	// Concatenate name, '=', and value to create the new environment variable
+	/* Concatenate name, '=', and value to create the new environment variable */
 	len_name = strlen(name);
 	len_value = strlen(value);
-	len_env = len_name + len_value + 2; // +1 for '=' and +1 for the null terminator
+	len_env = len_name + len_value + 2; /* +1 for '=' and +1 for the null terminator */
 	env_variable = malloc(len_env);
 	if (env_variable == NULL)
 	{
@@ -216,7 +216,7 @@ int set_env(const char *name, const char *value, int overwrite)
 		return (-1);
 	}
 	snprintf(env_variable, len_env, "%s=%s", name, value);
-	// Use putenv to set the environment variable
+	/* Use putenv to set the environment variable */
 	if (putenv(env_variable) != 0)
 	{
 		perror("setenv");
@@ -247,9 +247,9 @@ int unset_env(const char *name)
 		fprintf(stderr, "unsetenv: variable '%s' not found\n", name);
 		return (-1);
 	}
-	// Use putenv to remove the environment variable
+	/* Use putenv to remove the environment variable */
 	len_name = strlen(name);
-	len_env = len_name + 2; // +1 for '=' and +1 for the null terminator
+	len_env = len_name + 2; /* +1 for '=' and +1 for the null terminator */
 	env_variable = malloc(len_env);
 	if (env_variable == NULL)
 	{

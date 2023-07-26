@@ -42,11 +42,11 @@ ssize_t _getline(char **lineptr, size_t *n)
 		buffer_size += 1;
 		*lineptr = realloc(*lineptr, buffer_size);
 		if (*lineptr == NULL)
-			return -1;
+			return (-1);
 	}
 	(*lineptr)[buffer_pos] = '\0';
 	/* Update the size of the buffer */
 	*n = buffer_size;
 	/* Return the number of characters read */
-	return n_chars;
+	return (n_chars);
 }

@@ -20,13 +20,14 @@ int main(void)
     char *token;
     int i;
     char *end_of_token;
-    /* char prev_working_dir[PATH_MAX]; */
+    char prev_working_dir[PATH_MAX];
     /* adding a loop */
     while (1)
     {
         int pid;
         char *cmd;
-        char *actual_cmd, *home_dir, *prev_dir, *new_dir;
+        char *actual_cmd, *directory;
+        /*home_dir, *prev_dir, *new_dir; */
         /* printing the prompt */
         printf("%s", prompt);
         n_chars = _getline(&line, &p); // Use _getline() instead of getline()
@@ -121,35 +122,33 @@ int main(void)
         }
         else if (strcmp(cmd, "cd") == 0)
         {
-            // Handle the cd command
-            if (num_tokens == 1 || strcmp(tokens[1], "~") == 0)
+            // Handle the cd command separately
+            if (num_tokens > 1)
             {
-                // Change to the home directory (cd with no argument or cd ~)
-                home_dir = getenv("HOME");
-                if (home_dir)
-                {
-                    if (chdir(home_dir) == 0)
-                        setenv("PWD", home_dir, 1);
-                }
-            }
-            else if (strcmp(tokens[1], "-") == 0)
-            {
-                // Change to the previous working directory (cd -)
-                prev_dir = getenv("OLDPWD");
-                if (prev_dir)
-                {
-                    if (chdir(prev_dir) == 0)
-                        setenv("PWD", prev_dir, 1);
-                }
+                directory = tokens[1];
             }
             else
             {
-                // Change to the specified directory
-                new_dir = tokens[1];
-                if (chdir(new_dir) == 0)
-                    setenv("PWD", new_dir, 1);
-                else
-                    perror("cd");
+                directory = getenv("HOME"); // If no argument is given, use HOME directory
+            }
+
+            // Save the current working directory before changing it
+            if (getcwd(prev_working_dir, sizeof(prev_working_dir)) == NULL)
+            {
+                perror("getcwd");
+            }
+
+            if (chdir(directory) != 0)
+            {
+                perror("cd");
+            }
+            else
+            {
+                // Update the PWD environment variable
+                if (set_env("PWD", directory, 1) != 0)
+                {
+                    perror("setenv");
+                }
             }
         }
         /* Skip execution if the command is the shell program itself */
@@ -173,7 +172,7 @@ int main(void)
                 }
                 else if (pid == 0)
                 {
-                    execute_command(actual_cmd, tokens);
+                    execute_command(actual_cmd);
                     perror("execve failed");
                     free(actual_cmd);
                     free_tokens(tokens);

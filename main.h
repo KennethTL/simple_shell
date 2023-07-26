@@ -17,5 +17,7 @@ void ls_builtin(void);
 ssize_t _getline(char **lineptr, size_t *n);
 int get_tokens(char *line, char *tokens[], int max_tokens);
 void free_tokens(char **tokens);
+int set_env(const char *name, const char *value, int overwrite);
+int unset_env(const char *name);
 
 #endif /* MAIN_H */

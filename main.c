@@ -20,12 +20,13 @@ int main(void)
     char *token;
     int i;
     char *end_of_token;
+    /* char prev_working_dir[PATH_MAX]; */
     /* adding a loop */
     while (1)
     {
         int pid;
         char *cmd;
-        char *actual_cmd;
+        char *actual_cmd, *home_dir, *prev_dir, *new_dir;
         /* printing the prompt */
         printf("%s", prompt);
         n_chars = _getline(&line, &p); // Use _getline() instead of getline()
@@ -117,6 +118,39 @@ int main(void)
         else if (strcmp(cmd, "ls") == 0)
         {
             ls_builtin();
+        }
+        else if (strcmp(cmd, "cd") == 0)
+        {
+            // Handle the cd command
+            if (num_tokens == 1 || strcmp(tokens[1], "~") == 0)
+            {
+                // Change to the home directory (cd with no argument or cd ~)
+                home_dir = getenv("HOME");
+                if (home_dir)
+                {
+                    if (chdir(home_dir) == 0)
+                        setenv("PWD", home_dir, 1);
+                }
+            }
+            else if (strcmp(tokens[1], "-") == 0)
+            {
+                // Change to the previous working directory (cd -)
+                prev_dir = getenv("OLDPWD");
+                if (prev_dir)
+                {
+                    if (chdir(prev_dir) == 0)
+                        setenv("PWD", prev_dir, 1);
+                }
+            }
+            else
+            {
+                // Change to the specified directory
+                new_dir = tokens[1];
+                if (chdir(new_dir) == 0)
+                    setenv("PWD", new_dir, 1);
+                else
+                    perror("cd");
+            }
         }
         /* Skip execution if the command is the shell program itself */
         else if (strcmp(cmd, "./shell_0.3") == 0 || strcmp(cmd, "./shell_0.4.1") == 0)

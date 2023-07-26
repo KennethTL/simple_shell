@@ -185,9 +185,11 @@ void free_tokens(char **tokens)
 }
 /* This is for the setenv & unsetenv functions */
 /**
- * main - Building a Shell that's interactive
- *
- * Return: 0 on success, 1 on error
+ * set_env - adds the variable name to the environment
+ * @name: name of the variable
+ * @value: value of the variable name
+ * @overwrite: determines whether the value of name will change or not
+ * Return: 0 on success, -1 on error
  */
 int set_env(const char *name, const char *value, int overwrite)
 {

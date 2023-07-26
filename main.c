@@ -10,8 +10,7 @@
 
 int main(int ac, char **argv)
 {
-	char *prompt = "shell $ ", *token;
-	char *line = NULL, *line_copy = NULL; /* stores command and shell args */
+	char *prompt = "shell $ ", *token, *line = NULL, *line_copy = NULL;
 	size_t p = 0;
 	ssize_t n_chars; /* Stores the number of characters in a line*/
 	const char *delim = " \n";

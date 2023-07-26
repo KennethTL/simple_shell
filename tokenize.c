@@ -18,12 +18,12 @@ int get_tokens(char *line, char *tokens[], int max_tokens)
 	{
 		if (*current == ' ' || *current == '\n')
 		{
-			*current = '\0'; // Null-terminate the token
+			*current = '\0'; /* Null-terminate the token */
 			tokens[num_tokens] = token_start;
 			num_tokens++;
 			if (num_tokens >= max_tokens)
 				break;
-			// Move to the next non-space character
+			/* Move to the next non-space character */
 			while (*current == ' ' || *current == '\n')
 				current++;
 

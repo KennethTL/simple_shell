@@ -16,11 +16,11 @@ ssize_t _getline(char **lineptr, size_t *n)
 	int c;
 	/* Check if lineptr is NULL */
 	if (lineptr == NULL || n == NULL)
-		return -1;
+		return (-1);
 	/* Allocate the initial buffer */
 	*lineptr = malloc(buffer_size);
 	if (*lineptr == NULL)
-		return -1;
+		return (-1);
 	/* Read characters from input until newline or EOF is encountered */
 	while ((c = getchar()) != EOF && c != '\n')
 	{
@@ -30,7 +30,7 @@ ssize_t _getline(char **lineptr, size_t *n)
 			buffer_size += 1024;
 			*lineptr = realloc(*lineptr, buffer_size);
 			if (*lineptr == NULL)
-				return -1;
+				return (-1);
 		}
 
 		(*lineptr)[buffer_pos++] = c;

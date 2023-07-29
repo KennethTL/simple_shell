@@ -1,26 +1,25 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-/* Function declarations */
-char *get_env(char *cmd);
-void execute_command(char *cmd, char **argv);
-void print_env(void);
-void ls_builtin(void);
-ssize_t _getline(char **lineptr, size_t *n);
-int get_tokens(char *line, char *tokens[], int max_tokens);
-void free_tokens(char **tokens);
-int set_env(const char *name, const char *value, int overwrite);
-int unset_env(const char *name);
+#define SH_RL_BUFSIZE 1024
+#define SH_TOK_BUFSIZE 1024
+#define SH_TOK_DELIM " \t\r\n\a"
+#define UNUSED(x) void(x)
 
-/* Extern declaration */
-extern char **environ;
+void sh_loop(void);
+char *sh_read_line(void);
+char **sh_split_line(char *line);
+int sh_execute(char **args);
+int sh_launch(char **args);
+int sh_cd(char **args);
+int sh_help(char **args);
+int sh_exit(char **args);
+int sh_num_builtins();
 
-#endif /* MAIN_H */
+#endif
